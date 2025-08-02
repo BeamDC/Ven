@@ -24,7 +24,7 @@ pub trait MouseInteract {
     }
 
     /// run a function which can mutate the object when it is pressed
-    fn on_press_mut<F>(&self, mouse_button: MouseButton, f: F)
+    fn on_press_mut<F>(&self, mouse_button: MouseButton, mut f: F)
     where
         F: FnMut()
     {
