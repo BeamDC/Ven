@@ -1,7 +1,7 @@
-use macroquad::input::{is_mouse_button_down, mouse_position, MouseButton};
+use macroquad::input::{is_mouse_button_down, is_mouse_button_pressed, mouse_position, MouseButton};
 
 /// trait for all ui items to relate useful data
-pub trait Pos {
+pub trait Pos { // todo : better name :P
     /// return the width of the object
     fn get_width(&self) -> f32;
 
@@ -27,8 +27,6 @@ pub trait Pos {
 }
 
 
-// todo : make this require a size & pos trait,
-//   so we can just define stuff as default
 pub trait MouseInteract: Pos {
     /// if the object is being hovered over by the mouse
     fn is_hovered(&self) -> bool {
@@ -40,11 +38,27 @@ pub trait MouseInteract: Pos {
 
     /// if a given mouse button is clicked when the object is hovered
     fn is_pressed(&self, mouse_button: MouseButton) -> bool {
-        self.is_hovered() && is_mouse_button_down(mouse_button)
+        self.is_hovered() && is_mouse_button_pressed(mouse_button)
     }
 
-    // todo : the on_press functions may need some work,
-    //  this is just a prototype
+    fn on_hover<F>(&self, f: F)
+    where
+        F: FnOnce()
+    {
+        if self.is_hovered() {
+            f()
+        }
+    }
+
+    fn on_hover_mut<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&mut Self)
+    {
+        if self.is_hovered() {
+            f(self)
+        }
+    }
+
     /// run a function when the object is pressed
     fn on_press<F>(&self, mouse_button: MouseButton, f: F)
     where
