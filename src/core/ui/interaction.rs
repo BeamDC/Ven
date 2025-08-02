@@ -1,10 +1,42 @@
-use macroquad::input::{is_mouse_button_down, MouseButton};
+use macroquad::input::{is_mouse_button_down, mouse_position, MouseButton};
+
+/// trait for all ui items to relate useful data
+pub trait Pos {
+    /// return the width of the object
+    fn get_width(&self) -> f32;
+
+    /// return the height of the object
+    fn get_height(&self) -> f32;
+
+    /// return the x coordinate of the top left of the object
+    fn get_x(&self) -> f32;
+
+    /// return the y coordinate of the top left of the object
+    fn get_y(&self) -> f32;
+
+    /// return the x and y coordinate of the top left of the object
+    /// in the form `(x, y)`
+    fn get_pos(&self) -> (f32, f32) {
+        (self.get_x(), self.get_y())
+    }
+
+    /// return the width and height of the object in the form `(width, height)`
+    fn get_dimensions(&self) -> (f32, f32) {
+        (self.get_width(), self.get_height())
+    }
+}
+
 
 // todo : make this require a size & pos trait,
 //   so we can just define stuff as default
-pub trait MouseInteract {
+pub trait MouseInteract: Pos {
     /// if the object is being hovered over by the mouse
-    fn is_hovered(&self) -> bool;
+    fn is_hovered(&self) -> bool {
+        let (x, y) = self.get_pos();
+        let (width, height) = self.get_dimensions();
+        let (mx, my) = mouse_position();
+        mx >= x && mx <= x + width && my >= y && my <= y + height
+    }
 
     /// if a given mouse button is clicked when the object is hovered
     fn is_pressed(&self, mouse_button: MouseButton) -> bool {
@@ -23,13 +55,13 @@ pub trait MouseInteract {
         }
     }
 
-    /// run a function which can mutate the object when it is pressed
-    fn on_press_mut<F>(&self, mouse_button: MouseButton, mut f: F)
+    /// run a function which mutates the object when it is pressed
+    fn on_press_mut<F>(&mut self, mouse_button: MouseButton, mut f: F)
     where
-        F: FnMut()
+        F: FnMut(&mut Self)
     {
         if self.is_pressed(mouse_button) {
-            f()
+            f(self)
         }
     }
 }
