@@ -7,12 +7,13 @@ use crate::core::ui::interaction::MouseInteract;
 pub async fn run() {
     let mut b = Button::new(
         50.0, 50.0,
-        160.0, 100.0,
-        3.0, String::from("Hello, World!")
+        160.0, 50.0,
+        3.0, String::from("qwertyuiopasdfghjkl")
     );
     b.fill = Color::from_rgba(255,255,255,255);
     b.stroke = Color::from_rgba(255, 0, 0, 255);
     b.text_colour = Color::from_rgba(0, 255, 0, 255);
+    b.text_size = 25;
 
     loop {
         clear_background(BLACK);
