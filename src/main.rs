@@ -1,9 +1,9 @@
 use crate::core::run::run;
 
 mod core;
+mod constants;
 
-
-#[macroquad::main("MyGame")]
+#[macroquad::main("Ven")]
 async fn main() {
   run().await
 }
