@@ -1,23 +1,23 @@
-use std::path::PathBuf;
-use macroquad::color::{Color, BLACK};
-use macroquad::prelude::Font;
-use crate::core::ui::button::Button;
 use crate::core::ui::interaction::{MouseInteract, Pos};
 use crate::core::ui::object::Object;
-use crate::core::ui::scene::Scene;
+use macroquad::color::{Color, BLACK};
+use macroquad::prelude::{Font, Texture2D};
+use std::path::PathBuf;
 
-pub struct SceneViewer<'a> {
+pub struct Layer {
     pub x: f32,
     pub y: f32,
     pub width: f32,
     pub height: f32,
 
-    pub scenes: Vec<Scene<'a>>,
-    pub scene_view: Vec<Button<'a>>,
-    pub selected_scene: usize,
+    pub path: PathBuf,
+    pub texture: Texture2D,
+    // todo : preview will be used as the button icon in scenes
+    // pub preview: IDK
+    // pub effects: Vec<Effect>
 }
 
-impl Pos for SceneViewer<'_> {
+impl Pos for Layer {
     fn get_width(&self) -> f32 {
         self.width
     }
@@ -35,19 +35,16 @@ impl Pos for SceneViewer<'_> {
     }
 }
 
-impl MouseInteract for SceneViewer<'_> {}
-
-impl Object for SceneViewer<'_> {
+impl Object for Layer {
     fn get_border_thickness(&self) -> f32 {
         0.0
     }
 
     fn get_icon(&self) -> Option<PathBuf> {
-        None
+        None // todo : in the future this can be a
     }
 
     fn get_text(&self) -> String {
-        // this will not have any text
         String::new()
     }
 
@@ -67,3 +64,5 @@ impl Object for SceneViewer<'_> {
         todo!()
     }
 }
+
+impl MouseInteract for Layer {}
