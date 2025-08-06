@@ -23,6 +23,8 @@ pub async fn run() {
         // scale with screen
         toolbar.width = screen_width();
         scene_viewer.height = screen_height() - toolbar.height;
+        node_manager.width = screen_width() - scene_viewer.width;
+        node_manager.height = screen_height() - toolbar.height;
         clear_background(BLACK);
 
         // action handling
@@ -34,7 +36,7 @@ pub async fn run() {
                     next: vec![],
                 };
                 let tile = NodeTile::new(
-                    0.0, 0.0,
+                    node_manager.x, node_manager.y,
                     NODE_TILE_WIDTH, NODE_TILE_HEIGHT,
                     node
                 );
@@ -47,7 +49,7 @@ pub async fn run() {
                     next: vec![],
                 };
                 let tile = NodeTile::new(
-                    0.0, 0.0,
+                    node_manager.x, node_manager.y,
                     NODE_TILE_WIDTH, NODE_TILE_HEIGHT,
                     node
                 );
@@ -58,7 +60,7 @@ pub async fn run() {
                     text: "".to_string(),
                 };
                 let tile = NodeTile::new(
-                    0.0, 0.0,
+                    node_manager.x, node_manager.y,
                     NODE_TILE_WIDTH, NODE_TILE_HEIGHT,
                     node
                 );

@@ -14,6 +14,7 @@ pub struct NodeManager {
     pub width: f32,
     pub height: f32,
     pub thickness: f32,
+    pub zoom: f32,
 
     pub fill: Color,
     pub outline: Color,
@@ -87,9 +88,8 @@ impl Object for NodeManager {
         // draw gridlines
         // draw node tiles
         for mut node in self.nodes.clone() {
-            node.x += self.x;
-            node.y += self.y;
-
+            node.x = node.x.clamp(self.x, self.x + self.width - node.width);
+            node.y = node.y.clamp(self.y, self.y + self.height - node.height);
             node.outline = match node.node {
                 DialogueTree::Player { .. } => PLAYER_NODE_OUTLINE,
                 DialogueTree::NPC { .. } => NPC_NODE_OUTLINE,
@@ -115,6 +115,7 @@ impl NodeManager {
             width,
             height,
             thickness: 1.0,
+            zoom: 1.0,
             fill: NODE_MANAGER_FILL,
             outline: PANEL_OUTLINE_FILL,
             nodes: vec![],

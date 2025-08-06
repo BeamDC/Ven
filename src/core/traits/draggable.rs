@@ -55,7 +55,6 @@ pub trait Draggable: Object + MouseInteract + Clone {
         // If we're currently dragging
         else {
             if is_mouse_button_down(MouseButton::Left) {
-                println!("Drag updated");
                 // Update position based on mouse position and offset
                 let drag_state = self.get_drag_state();
                 let new_x = mouse_x + drag_state.drag_offset.0;
