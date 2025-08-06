@@ -1,11 +1,11 @@
-use std::path::PathBuf;
-use crate::core::ui::interaction::{MouseInteract, Pos};
 use macroquad::color::Color;
 use macroquad::math::Vec2;
 use macroquad::prelude::ImageFormat;
-use macroquad::shapes::{draw_rectangle_ex, DrawRectangleParams, draw_rectangle_lines_ex};
-use macroquad::text::{draw_text_ex, measure_text, Font, TextParams};
-use crate::core::ui::object::Object;
+use macroquad::shapes::{draw_rectangle_ex, draw_rectangle_lines_ex, DrawRectangleParams};
+use macroquad::text::Font;
+use std::path::PathBuf;
+use crate::core::traits::interaction::{MouseInteract, Pos};
+use crate::core::traits::object::Object;
 
 /// the standard clickable button that will be used in both editor and game ui
 pub struct Button<'a> {
@@ -42,6 +42,14 @@ impl Pos for Button<'_> {
 
     fn get_y(&self) -> f32 {
         self.y
+    }
+
+    fn set_x(&mut self, new: f32) {
+        todo!()
+    }
+
+    fn set_y(&mut self, new: f32) {
+        todo!()
     }
 }
 

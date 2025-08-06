@@ -1,28 +1,29 @@
 use std::path::PathBuf;
-use macroquad::color::{Color, BLACK};
-use macroquad::prelude::{draw_rectangle_ex, draw_rectangle_lines_ex, DrawRectangleParams, Font};
-use crate::constants::{PANEL_BG_FILL, PANEL_OUTLINE_FILL, PANEL_OUTLINE_THICKNESS};
-use crate::core::components::scene::Scene;
+use macroquad::color::Color;
+use macroquad::prelude::{draw_rectangle_ex, Font, BLACK};
+use macroquad::shapes::{draw_rectangle_lines_ex, DrawRectangleParams};
+use crate::constants::{NPC_NODE_OUTLINE, PANEL_BG_FILL, PLAYER_NODE_OUTLINE, STORY_NODE_OUTLINE};
+use crate::core::components::dialogue_tree::DialogueTree;
+use crate::core::traits::draggable::{Drag, Draggable};
 use crate::core::traits::interaction::{MouseInteract, Pos};
 use crate::core::traits::object::Object;
-use crate::core::ui::button::Button;
 
-pub struct SceneViewer<'a> {
+#[derive(Clone)]
+pub struct NodeTile {
     pub x: f32,
     pub y: f32,
     pub width: f32,
     pub height: f32,
     pub thickness: f32,
 
+    pub node: DialogueTree,
+
     pub fill: Color,
     pub outline: Color,
-
-    pub scenes: Vec<Scene<'a>>,
-    pub scene_view: Vec<Button<'a>>,
-    pub selected_scene: usize,
+    pub drag: Drag,
 }
 
-impl Pos for SceneViewer<'_> {
+impl Pos for NodeTile {
     fn get_width(&self) -> f32 {
         self.width
     }
@@ -40,17 +41,15 @@ impl Pos for SceneViewer<'_> {
     }
 
     fn set_x(&mut self, new: f32) {
-        todo!()
+        self.x = new;
     }
 
     fn set_y(&mut self, new: f32) {
-        todo!()
+        self.y = new;
     }
 }
 
-impl MouseInteract for SceneViewer<'_> {}
-
-impl Object for SceneViewer<'_> {
+impl Object for NodeTile {
     fn get_border_thickness(&self) -> f32 {
         self.thickness
     }
@@ -60,7 +59,6 @@ impl Object for SceneViewer<'_> {
     }
 
     fn get_text(&self) -> String {
-        // this will not have any text
         String::new()
     }
 
@@ -77,6 +75,7 @@ impl Object for SceneViewer<'_> {
     }
 
     fn draw(&self) {
+        // draw base rect
         draw_rectangle_ex(
             self.x, self.y,
             self.width, self.height,
@@ -86,6 +85,8 @@ impl Object for SceneViewer<'_> {
                 color: self.fill,
             }
         );
+
+        // draw lines
         draw_rectangle_lines_ex(
             self.x, self.y,
             self.width, self.height,
@@ -99,18 +100,36 @@ impl Object for SceneViewer<'_> {
     }
 }
 
-impl SceneViewer<'_> {
-    pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
-        SceneViewer {
-            x, y,
-            width, height,
+impl MouseInteract for NodeTile {}
 
-            thickness: PANEL_OUTLINE_THICKNESS,
+impl Draggable for NodeTile {
+    fn get_drag_state(&self) -> &Drag {
+        &self.drag
+    }
+
+    fn get_drag_state_mut(&mut self) -> &mut Drag {
+        &mut self.drag
+    }
+}
+
+impl NodeTile {
+    pub fn new(x: f32, y: f32, width: f32, height: f32, node: DialogueTree) -> NodeTile {
+        let outline = match node {
+            DialogueTree::Player { .. } => PLAYER_NODE_OUTLINE,
+            DialogueTree::NPC { .. } => NPC_NODE_OUTLINE,
+            DialogueTree::Story { .. } => STORY_NODE_OUTLINE,
+        };
+
+        NodeTile {
+            x,
+            y,
+            width,
+            height,
+            thickness: 2.0,
+            node,
             fill: PANEL_BG_FILL,
-            outline: PANEL_OUTLINE_FILL,
-            scenes: vec![],
-            scene_view: vec![],
-            selected_scene: 0,
+            outline,
+            drag: Drag::default()
         }
     }
 }

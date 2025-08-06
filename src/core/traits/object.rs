@@ -1,10 +1,10 @@
-use crate::core::ui::interaction::Pos;
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_text_ex, draw_texture_ex, measure_text, DrawTextureParams, Image, ImageFormat, TextParams};
 use macroquad::text::Font;
 use macroquad::texture::Texture2D;
 use std::path::PathBuf;
+use crate::core::traits::interaction::Pos;
 
 /// The standard UI Object, assumed to be a rectangle by default
 pub trait Object: Pos {

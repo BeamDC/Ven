@@ -1,4 +1,4 @@
-use macroquad::input::{is_mouse_button_down, is_mouse_button_pressed, mouse_position, MouseButton};
+use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
 
 /// trait for all ui items to relate useful data
 pub trait Pos { // todo : better name :P
@@ -13,6 +13,12 @@ pub trait Pos { // todo : better name :P
 
     /// return the y coordinate of the top left of the object
     fn get_y(&self) -> f32;
+
+    /// set the x coordinate of the top left of the object
+    fn set_x(&mut self, new: f32);
+
+    /// set the y coordinate of the top left of the object
+    fn set_y(&mut self, new: f32);
 
     /// return the x and y coordinate of the top left of the object
     /// in the form `(x, y)`
@@ -41,13 +47,14 @@ pub trait MouseInteract: Pos {
         self.is_hovered() && is_mouse_button_pressed(mouse_button)
     }
 
-    fn on_hover<F>(&self, f: F)
+    fn on_hover<F, T>(&self, f: F) -> Option<T>
     where
-        F: FnOnce()
+        F: FnOnce() -> T
     {
         if self.is_hovered() {
-            f()
+            return Some(f())
         }
+        None
     }
 
     fn on_hover_mut<F>(&mut self, mut f: F)
@@ -60,13 +67,14 @@ pub trait MouseInteract: Pos {
     }
 
     /// run a function when the object is pressed
-    fn on_press<F>(&self, mouse_button: MouseButton, f: F)
+    fn on_press<F, T>(&self, mouse_button: MouseButton, f: F) -> Option<T>
     where
-        F: FnOnce()
+        F: FnOnce() -> T
     {
         if self.is_pressed(mouse_button) {
-            f()
+            return Some(f())
         }
+        None
     }
 
     /// run a function which mutates the object when it is pressed
