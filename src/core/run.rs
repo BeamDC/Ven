@@ -79,7 +79,12 @@ pub async fn run() {
                 node_manager.nodes.remove(i);
             }
             Some(NodeAction::SelectIndex(i)) => {
-                node_manager.selected = Some(i);
+                if node_manager.selected.is_some() &&
+                    i == node_manager.selected.unwrap() {
+                    node_manager.selected = None;
+                } else {
+                    node_manager.selected = Some(i);
+                }
             }
             None => {}
         }
@@ -87,10 +92,6 @@ pub async fn run() {
         // rendering
         scene_viewer.draw();
         toolbar.draw();
-
-        for node in &mut node_manager.nodes {
-            node.update_drag();
-        }
         node_manager.draw();
 
         next_frame().await

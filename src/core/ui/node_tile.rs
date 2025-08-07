@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::time::Instant;
 use macroquad::color::Color;
 use macroquad::prelude::{draw_rectangle_ex, Font, BLACK};
 use macroquad::shapes::{draw_rectangle_lines_ex, DrawRectangleParams};
@@ -15,6 +16,7 @@ pub struct NodeTile {
     pub width: f32,
     pub height: f32,
     pub thickness: f32,
+    pub last_click: Option<Instant>,
 
     pub node: DialogueTree,
 
@@ -122,6 +124,7 @@ impl NodeTile {
             width,
             height,
             thickness: 2.0,
+            last_click: None,
             node,
             fill: PANEL_BG_FILL,
             outline,

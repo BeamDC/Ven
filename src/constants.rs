@@ -22,7 +22,7 @@ pub const TOOLBAR_BUTTON_HIGHLIGHT: Color = normalize_color!((86, 86, 86));
 pub const TOOLBAR_HEIGHT: f32 = 60f32;
 pub const TOOLBAR_BUTTON_SIZE: f32 = 50f32;
 
-pub const SCENE_VIEWER_WIDTH: f32 = 200.0;
+pub const SCENE_VIEWER_WIDTH: f32 = 200f32;
 
 pub const PLAYER_NODE_OUTLINE: Color = normalize_color!((158, 66, 245));
 pub const NPC_NODE_OUTLINE: Color = normalize_color!((27, 119, 224));
@@ -31,8 +31,9 @@ pub const STORY_NODE_OUTLINE: Color = normalize_color!((110, 110, 110));
 pub const NODE_MANAGER_FILL: Color = normalize_color!((15, 15, 15));
 pub const NODE_MANAGER_LINES: Color = normalize_color!((30, 30, 30));
 
-pub const NODE_HOVER_OUTLINE: Color = normalize_color!((255, 175, 15));
+pub const NODE_SELECT_OUTLINE: Color = normalize_color!((255, 175, 15));
 pub const NODE_HIGHLIGHT: Color = normalize_color!((70, 70, 70));
-pub const NODE_TILE_WIDTH: f32 = 200.0;
-pub const NODE_TILE_HEIGHT: f32 = 125.0;
+pub const NODE_TILE_WIDTH: f32 = 200f32;
+pub const NODE_TILE_HEIGHT: f32 = 125f32;
 
+pub const DOUBLE_CLICK_DELAY_MS: u128 = 300u128;

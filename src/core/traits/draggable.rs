@@ -23,7 +23,6 @@ pub trait Draggable: Object + MouseInteract + Clone {
     fn get_drag_state_mut(&mut self) -> &mut Drag;
 
     fn start_drag(&mut self, mouse_x: f32, mouse_y: f32) {
-        println!("Drag start");
         let offset = (
             self.get_x() - mouse_x,
             self.get_y() - mouse_y,
@@ -34,7 +33,6 @@ pub trait Draggable: Object + MouseInteract + Clone {
     }
 
     fn stop_drag(&mut self) {
-        println!("Drag stopped");
         self.get_drag_state_mut().is_dragging = false;
     }
 

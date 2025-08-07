@@ -1,4 +1,4 @@
-use crate::constants::{NODE_HIGHLIGHT, NODE_HOVER_OUTLINE, NODE_MANAGER_FILL, NODE_MANAGER_LINES, NPC_NODE_OUTLINE, PANEL_BG_FILL, PANEL_OUTLINE_FILL, PLAYER_NODE_OUTLINE, STORY_NODE_OUTLINE};
+use crate::constants::{NODE_HIGHLIGHT, NODE_SELECT_OUTLINE, NODE_MANAGER_FILL, NODE_MANAGER_LINES, NPC_NODE_OUTLINE, PANEL_BG_FILL, PANEL_OUTLINE_FILL, PLAYER_NODE_OUTLINE, STORY_NODE_OUTLINE, DOUBLE_CLICK_DELAY_MS};
 use crate::core::components::dialogue_tree::DialogueTree;
 use crate::core::traits::interaction::{MouseInteract, Pos};
 use crate::core::traits::object::Object;
@@ -6,7 +6,9 @@ use crate::core::ui::node_tile::NodeTile;
 use macroquad::color::{Color, BLACK};
 use macroquad::prelude::{draw_rectangle_ex, DrawRectangleParams, Font};
 use std::path::PathBuf;
+use std::time::Instant;
 use macroquad::input::MouseButton;
+use crate::core::traits::draggable::Draggable;
 use crate::core::ui::node_manager::NodeAction::{RemoveIndex, SelectIndex};
 
 pub enum NodeAction {
@@ -91,14 +93,9 @@ impl Object for NodeManager {
 
         // draw gridlines
         // draw node tiles
-        for mut node in self.nodes.clone() {
+        for  (i, mut node) in self.nodes.clone().iter_mut().enumerate() {
             node.x = node.x.clamp(self.x, self.x + self.width - node.width);
             node.y = node.y.clamp(self.y, self.y + self.height - node.height);
-
-            // todo : add collision for other nodes
-            for other in self.nodes.clone() {
-
-            }
 
             node.outline = match node.node {
                 DialogueTree::Player { .. } => PLAYER_NODE_OUTLINE,
@@ -107,9 +104,11 @@ impl Object for NodeManager {
             };
             node.fill = PANEL_BG_FILL;
             node.on_hover_mut(|nt| {
-                nt.outline = NODE_HOVER_OUTLINE;
                 nt.fill = NODE_HIGHLIGHT;
             });
+            if self.selected.is_some() && i == self.selected.unwrap() {
+                node.outline = NODE_SELECT_OUTLINE;
+            }
             node.draw();
         }
     }
@@ -135,10 +134,20 @@ impl NodeManager {
     }
 
     pub fn handle_inputs(&mut self) -> Option<NodeAction> {
+        for node in &mut self.nodes.iter_mut().rev() {
+            node.update_drag();
+        }
+
         // node selection
-        for (i, node) in self.nodes.iter().enumerate().rev(){
+        for (i, mut node) in self.nodes.iter_mut().enumerate().rev(){
             if node.is_pressed(MouseButton::Left) {
-                return Some(SelectIndex(i))
+                let time = Instant::now();
+                if let Some(last) = node.last_click {
+                    if last.elapsed().as_millis() <= DOUBLE_CLICK_DELAY_MS {
+                         return Some(SelectIndex(i))
+                    }
+                }
+                node.last_click = Some(time);
             }
         }
 
@@ -148,6 +157,7 @@ impl NodeManager {
                 return Some(RemoveIndex(i))
             }
         }
+
         None
     }
 }
