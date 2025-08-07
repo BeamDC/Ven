@@ -51,10 +51,6 @@ impl Pos for SceneViewer<'_> {
 impl MouseInteract for SceneViewer<'_> {}
 
 impl Object for SceneViewer<'_> {
-    fn get_border_thickness(&self) -> f32 {
-        self.thickness
-    }
-
     fn get_icon(&self) -> Option<PathBuf> {
         None
     }

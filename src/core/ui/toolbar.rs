@@ -7,9 +7,9 @@ use macroquad::shapes::{draw_rectangle_ex, draw_rectangle_lines_ex, DrawRectangl
 use std::path::PathBuf;
 use crate::core::traits::interaction::{MouseInteract, Pos};
 use crate::core::traits::object::Object;
-use crate::core::ui::toolbar::Action::{AddNpc, AddPlayer, AddStory};
+use crate::core::ui::toolbar::ToolbarAction::{AddNpc, AddPlayer, AddStory};
 
-pub enum Action {
+pub enum ToolbarAction {
     AddPlayer,
     AddNpc,
     AddStory,
@@ -59,10 +59,6 @@ impl Pos for Toolbar<'_> {
 }
 
 impl Object for Toolbar<'_> {
-    fn get_border_thickness(&self) -> f32 {
-        self.thickness
-    }
-
     fn get_icon(&self) -> Option<PathBuf> {
         None
     }
@@ -176,7 +172,7 @@ impl Toolbar<'_> {
         }
     }
 
-    pub fn handle_input(&mut self) -> Option<Action> {
+    pub fn handle_input(&mut self) -> Option<ToolbarAction> {
         // import
         self.import.fill = TOOLBAR_BUTTON_FILL;
         self.import.on_hover_mut(|b| {
@@ -200,7 +196,7 @@ impl Toolbar<'_> {
         self.add_player.on_hover_mut(|b| {
             b.fill = TOOLBAR_BUTTON_HIGHLIGHT;
         });
-        let add_player = self.add_player.on_press(MouseButton::Left, || -> Option<Action> {
+        let add_player = self.add_player.on_press(MouseButton::Left, || -> Option<ToolbarAction> {
             println!("Player Added!");
             Some(AddPlayer)
         }).unwrap_or(None);
@@ -210,7 +206,7 @@ impl Toolbar<'_> {
         self.add_npc.on_hover_mut(|b| {
             b.fill = TOOLBAR_BUTTON_HIGHLIGHT;
         });
-        let add_npc = self.add_npc.on_press(MouseButton::Left, || -> Option<Action> {
+        let add_npc = self.add_npc.on_press(MouseButton::Left, || -> Option<ToolbarAction> {
             println!("NPC Added!");
             Some(AddNpc)
         }).unwrap_or(None);
@@ -220,7 +216,7 @@ impl Toolbar<'_> {
         self.add_story.on_hover_mut(|b| {
             b.fill = TOOLBAR_BUTTON_HIGHLIGHT;
         });
-        let add_story = self.add_story.on_press(MouseButton::Left, || -> Option<Action> {
+        let add_story = self.add_story.on_press(MouseButton::Left, || -> Option<ToolbarAction> {
             println!("Story Added!");
             Some(AddStory)
         }).unwrap_or(None);

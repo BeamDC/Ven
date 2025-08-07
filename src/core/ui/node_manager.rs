@@ -1,12 +1,18 @@
-use std::path::PathBuf;
-use macroquad::color::{Color, BLACK};
-use macroquad::input::MouseButton;
-use macroquad::prelude::{draw_rectangle_ex, DrawRectangleParams, Font};
-use crate::constants::{NODE_HIGHLIGHT, NODE_HOVER_OUTLINE, NODE_MANAGER_FILL, NPC_NODE_OUTLINE, PANEL_BG_FILL, PANEL_OUTLINE_FILL, PLAYER_NODE_OUTLINE, STORY_NODE_OUTLINE, TOOLBAR_BUTTON_HIGHLIGHT};
+use crate::constants::{NODE_HIGHLIGHT, NODE_HOVER_OUTLINE, NODE_MANAGER_FILL, NODE_MANAGER_LINES, NPC_NODE_OUTLINE, PANEL_BG_FILL, PANEL_OUTLINE_FILL, PLAYER_NODE_OUTLINE, STORY_NODE_OUTLINE};
 use crate::core::components::dialogue_tree::DialogueTree;
 use crate::core::traits::interaction::{MouseInteract, Pos};
 use crate::core::traits::object::Object;
 use crate::core::ui::node_tile::NodeTile;
+use macroquad::color::{Color, BLACK};
+use macroquad::prelude::{draw_rectangle_ex, DrawRectangleParams, Font};
+use std::path::PathBuf;
+use macroquad::input::MouseButton;
+use crate::core::ui::node_manager::NodeAction::{RemoveIndex, SelectIndex};
+
+pub enum NodeAction {
+    RemoveIndex(usize),
+    SelectIndex(usize),
+}
 
 pub struct NodeManager {
     pub x: f32,
@@ -18,8 +24,10 @@ pub struct NodeManager {
 
     pub fill: Color,
     pub outline: Color,
+    pub lines: Color,
 
-    pub nodes: Vec<NodeTile>
+    pub nodes: Vec<NodeTile>,
+    pub selected: Option<usize>,
 }
 
 impl Pos for NodeManager {
@@ -49,10 +57,6 @@ impl Pos for NodeManager {
 }
 
 impl Object for NodeManager {
-    fn get_border_thickness(&self) -> f32 {
-        self.thickness
-    }
-
     fn get_icon(&self) -> Option<PathBuf> {
         None
     }
@@ -90,6 +94,12 @@ impl Object for NodeManager {
         for mut node in self.nodes.clone() {
             node.x = node.x.clamp(self.x, self.x + self.width - node.width);
             node.y = node.y.clamp(self.y, self.y + self.height - node.height);
+
+            // todo : add collision for other nodes
+            for other in self.nodes.clone() {
+
+            }
+
             node.outline = match node.node {
                 DialogueTree::Player { .. } => PLAYER_NODE_OUTLINE,
                 DialogueTree::NPC { .. } => NPC_NODE_OUTLINE,
@@ -118,7 +128,26 @@ impl NodeManager {
             zoom: 1.0,
             fill: NODE_MANAGER_FILL,
             outline: PANEL_OUTLINE_FILL,
+            lines: NODE_MANAGER_LINES,
             nodes: vec![],
+            selected: None
         }
+    }
+
+    pub fn handle_inputs(&mut self) -> Option<NodeAction> {
+        // node selection
+        for (i, node) in self.nodes.iter().enumerate().rev(){
+            if node.is_pressed(MouseButton::Left) {
+                return Some(SelectIndex(i))
+            }
+        }
+
+        // node deletion
+        for (i, node) in self.nodes.iter().enumerate().rev(){
+            if node.is_pressed(MouseButton::Right) {
+                return Some(RemoveIndex(i))
+            }
+        }
+        None
     }
 }

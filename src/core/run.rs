@@ -1,11 +1,11 @@
 use crate::core::traits::object::Object;
 use crate::constants::{NODE_TILE_HEIGHT, NODE_TILE_WIDTH, SCENE_VIEWER_WIDTH, TOOLBAR_HEIGHT};
 use crate::core::ui::scene_viewer::SceneViewer;
-use crate::core::ui::toolbar::{Action, Toolbar};
+use crate::core::ui::toolbar::{ToolbarAction, Toolbar};
 use macroquad::prelude::*;
 use crate::core::components::dialogue_tree::DialogueTree;
 use crate::core::traits::draggable::Draggable;
-use crate::core::ui::node_manager::NodeManager;
+use crate::core::ui::node_manager::{NodeAction, NodeManager};
 use crate::core::ui::node_tile::NodeTile;
 
 pub async fn run() {
@@ -27,11 +27,12 @@ pub async fn run() {
         node_manager.height = screen_height() - toolbar.height;
         clear_background(BLACK);
 
-        // action handling
-        let action = toolbar.handle_input();
-        match action {
-            Some(Action::AddPlayer) => {
+        // toolbar action handling
+        let toolbar_action = toolbar.handle_input();
+        match toolbar_action {
+            Some(ToolbarAction::AddPlayer) => {
                 let node = DialogueTree::Player {
+                    from: vec![],
                     text: "".to_string(),
                     next: vec![],
                 };
@@ -42,8 +43,9 @@ pub async fn run() {
                 );
                 node_manager.nodes.push(tile);
             }
-            Some(Action::AddNpc) => {
+            Some(ToolbarAction::AddNpc) => {
                 let node = DialogueTree::NPC {
+                    from: vec![],
                     speaker: "".to_string(),
                     text: "".to_string(),
                     next: vec![],
@@ -55,8 +57,9 @@ pub async fn run() {
                 );
                 node_manager.nodes.push(tile);
             }
-            Some(Action::AddStory) => {
+            Some(ToolbarAction::AddStory) => {
                 let node = DialogueTree::Story {
+                    from: vec![],
                     text: "".to_string(),
                 };
                 let tile = NodeTile::new(
@@ -65,6 +68,18 @@ pub async fn run() {
                     node
                 );
                 node_manager.nodes.push(tile);
+            }
+            None => {}
+        }
+
+        // node manager action handling
+        let node_action = node_manager.handle_inputs();
+        match node_action {
+            Some(NodeAction::RemoveIndex(i)) => {
+                node_manager.nodes.remove(i);
+            }
+            Some(NodeAction::SelectIndex(i)) => {
+                node_manager.selected = Some(i);
             }
             None => {}
         }

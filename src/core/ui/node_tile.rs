@@ -50,10 +50,6 @@ impl Pos for NodeTile {
 }
 
 impl Object for NodeTile {
-    fn get_border_thickness(&self) -> f32 {
-        self.thickness
-    }
-
     fn get_icon(&self) -> Option<PathBuf> {
         None
     }
@@ -103,7 +99,7 @@ impl Object for NodeTile {
 impl MouseInteract for NodeTile {}
 
 impl Draggable for NodeTile {
-    fn get_drag_state(&self) -> &Drag {
+    fn get_drag(&self) -> &Drag {
         &self.drag
     }
 

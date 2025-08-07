@@ -54,10 +54,6 @@ impl Pos for Button<'_> {
 }
 
 impl Object for Button<'_> {
-    fn get_border_thickness(&self) -> f32 {
-        self.thickness
-    }
-
     fn get_icon(&self) -> Option<PathBuf> {
         Some(self.icon.clone())
     }

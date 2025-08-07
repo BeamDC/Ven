@@ -141,7 +141,6 @@ impl<T> FromIterator<T> for P<[T]> {
 impl<T> IntoIterator for P<[T]> {
     type Item = T;
     type IntoIter = vec::IntoIter<T>;
-
     fn into_iter(self) -> Self::IntoIter {
         self.into_vec().into_iter()
     }

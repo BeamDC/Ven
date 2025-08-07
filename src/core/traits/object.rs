@@ -8,7 +8,6 @@ use crate::core::traits::interaction::Pos;
 
 /// The standard UI Object, assumed to be a rectangle by default
 pub trait Object: Pos {
-    fn get_border_thickness(&self) -> f32;
     fn get_icon(&self) -> Option<PathBuf>;
 
     // text related functions
