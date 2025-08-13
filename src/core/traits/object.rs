@@ -1,7 +1,7 @@
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_text_ex, draw_texture_ex, measure_text, DrawTextureParams, Image, ImageFormat, TextParams};
-use macroquad::text::Font;
+use macroquad::text::{draw_multiline_text, draw_multiline_text_ex, Font};
 use macroquad::texture::Texture2D;
 use std::path::PathBuf;
 use crate::core::traits::interaction::Pos;
@@ -9,6 +9,7 @@ use crate::core::traits::interaction::Pos;
 /// The standard UI Object, assumed to be a rectangle by default
 pub trait Object: Pos {
     fn get_icon(&self) -> Option<PathBuf>;
+    fn get_thickness(&self) -> f32;
 
     // text related functions
     fn get_text(&self) -> String;
@@ -92,6 +93,48 @@ pub trait Object: Pos {
             self.get_text().as_str(),
             pad_x,
             pad_y,
+            params
+        );
+    }
+
+    /// draw the text associated with an [`Object`],
+    /// justified in the center of the object.
+    fn draw_text_multiline(&self) {
+        let mut dim = measure_text(
+            self.get_text().as_str(),
+            self.get_font(),
+            self.get_font_size(),
+            1.0,
+        );
+
+        let mut font_size = self.get_font_size();
+        while dim.width >= self.get_width() || dim.height >= self.get_height() {
+            font_size -= 1;
+            dim = measure_text(
+                self.get_text().as_str(),
+                self.get_font(),
+                font_size,
+                1.0,
+            );
+        }
+
+        let pad_x = self.get_x() + (self.get_width() - dim.width) / 2.0;
+        let pad_y = self.get_y() + (self.get_height() + dim.height) / 2.0;
+
+        let params = TextParams {
+            font: self.get_font(),
+            font_size,
+            font_scale: 1.0,
+            font_scale_aspect: 1.0,
+            rotation: 0.0,
+            color: self.get_text_colour(),
+        };
+
+        draw_multiline_text_ex(
+            self.get_text().as_str(),
+            pad_x,
+            pad_y,
+            None, // todo : find proper spacing
             params
         );
     }

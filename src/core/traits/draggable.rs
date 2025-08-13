@@ -36,7 +36,7 @@ pub trait Draggable: Object + MouseInteract + Clone {
         self.get_drag_state_mut().is_dragging = false;
     }
 
-    fn update_drag(&mut self) {
+    fn update_drag(&mut self) -> bool{
         let (mouse_x, mouse_y) = mouse_position();
         let drag = self.get_drag();
 
@@ -44,7 +44,9 @@ pub trait Draggable: Object + MouseInteract + Clone {
         if !drag.is_dragging {
             if self.is_pressed(MouseButton::Left) {
                 self.start_drag(mouse_x, mouse_y);
+                return true
             }
+            false
         }
 
         // If we're currently dragging
@@ -61,6 +63,7 @@ pub trait Draggable: Object + MouseInteract + Clone {
                 // Mouse button released, stop dragging
                 self.stop_drag();
             }
+            true
         }
     }
 }

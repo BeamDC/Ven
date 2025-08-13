@@ -55,6 +55,10 @@ impl Object for SceneViewer<'_> {
         None
     }
 
+    fn get_thickness(&self) -> f32 {
+        todo!()
+    }
+
     fn get_text(&self) -> String {
         // this will not have any text
         String::new()

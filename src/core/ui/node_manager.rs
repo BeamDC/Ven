@@ -16,7 +16,7 @@ pub enum NodeAction {
     SelectIndex(usize),
 }
 
-pub struct NodeManager {
+pub struct NodeManager<'a> {
     pub x: f32,
     pub y: f32,
     pub width: f32,
@@ -28,11 +28,11 @@ pub struct NodeManager {
     pub outline: Color,
     pub lines: Color,
 
-    pub nodes: Vec<NodeTile>,
+    pub nodes: Vec<NodeTile<'a>>,
     pub selected: Option<usize>,
 }
 
-impl Pos for NodeManager {
+impl Pos for NodeManager<'_> {
     fn get_width(&self) -> f32 {
         self.width
     }
@@ -58,9 +58,13 @@ impl Pos for NodeManager {
     }
 }
 
-impl Object for NodeManager {
+impl Object for NodeManager<'_> {
     fn get_icon(&self) -> Option<PathBuf> {
         None
+    }
+
+    fn get_thickness(&self) -> f32 {
+        todo!()
     }
 
     fn get_text(&self) -> String {
@@ -103,6 +107,7 @@ impl Object for NodeManager {
                 DialogueTree::Story { .. } => STORY_NODE_OUTLINE,
             };
             node.fill = PANEL_BG_FILL;
+            // todo : only highlight the top one
             node.on_hover_mut(|nt| {
                 nt.fill = NODE_HIGHLIGHT;
             });
@@ -114,10 +119,10 @@ impl Object for NodeManager {
     }
 }
 
-impl MouseInteract for NodeManager {}
+impl MouseInteract for NodeManager<'_> {}
 
-impl NodeManager {
-    pub fn new(x: f32, y: f32, width: f32, height: f32) -> NodeManager {
+impl NodeManager<'_> {
+    pub fn new(x: f32, y: f32, width: f32, height: f32) -> NodeManager<'static> {
         NodeManager {
             x,
             y,
@@ -135,7 +140,7 @@ impl NodeManager {
 
     pub fn handle_inputs(&mut self) -> Option<NodeAction> {
         for node in &mut self.nodes.iter_mut().rev() {
-            node.update_drag();
+            if node.update_drag() {break}
         }
 
         // node selection
@@ -152,7 +157,7 @@ impl NodeManager {
         }
 
         // node deletion
-        for (i, node) in self.nodes.iter().enumerate().rev(){
+        for (i, node) in self.nodes.iter().enumerate().rev() {
             if node.is_pressed(MouseButton::Right) {
                 return Some(RemoveIndex(i))
             }

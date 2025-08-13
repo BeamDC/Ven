@@ -29,11 +29,12 @@ pub async fn run() {
 
         // toolbar action handling
         let toolbar_action = toolbar.handle_input();
+        let text = String::from("Enter text here...");
         match toolbar_action {
             Some(ToolbarAction::AddPlayer) => {
                 let node = DialogueTree::Player {
                     from: vec![],
-                    text: "".to_string(),
+                    text,
                     next: vec![],
                 };
                 let tile = NodeTile::new(
@@ -47,7 +48,7 @@ pub async fn run() {
                 let node = DialogueTree::NPC {
                     from: vec![],
                     speaker: "".to_string(),
-                    text: "".to_string(),
+                    text,
                     next: vec![],
                 };
                 let tile = NodeTile::new(
@@ -60,7 +61,7 @@ pub async fn run() {
             Some(ToolbarAction::AddStory) => {
                 let node = DialogueTree::Story {
                     from: vec![],
-                    text: "".to_string(),
+                    text,
                 };
                 let tile = NodeTile::new(
                     node_manager.x, node_manager.y,

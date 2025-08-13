@@ -58,6 +58,10 @@ impl Object for Button<'_> {
         Some(self.icon.clone())
     }
 
+    fn get_thickness(&self) -> f32 {
+        todo!()
+    }
+
     fn get_text(&self) -> String {
         self.label.clone()
     }
