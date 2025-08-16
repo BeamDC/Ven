@@ -114,6 +114,13 @@ impl Object for NodeManager<'_> {
             if self.selected.is_some() && i == self.selected.unwrap() {
                 node.outline = NODE_SELECT_OUTLINE;
             }
+
+            node.connections.0.x = node.x;
+            node.connections.0.y = node.y + node.height / 2.0;
+
+            node.connections.1.x = node.x + node.width;
+            node.connections.1.y = node.y + node.height / 2.0;
+
             node.draw();
         }
     }

@@ -10,6 +10,7 @@ use crate::core::components::dialogue_tree::DialogueTree;
 use crate::core::traits::draggable::{Drag, Draggable};
 use crate::core::traits::interaction::{MouseInteract, Pos};
 use crate::core::traits::object::Object;
+use crate::core::ui::connection::Connection;
 
 #[derive(Clone)]
 pub struct NodeTile<'a> {
@@ -18,11 +19,11 @@ pub struct NodeTile<'a> {
     pub width: f32,
     pub height: f32,
     pub thickness: f32,
-    pub radius: f32,
     pub line_spacing: f32,
     pub last_click: Option<Instant>,
 
     pub node: DialogueTree,
+    pub connections: (Connection, Connection),
 
     pub fill: Color,
     pub outline: Color,
@@ -131,7 +132,6 @@ impl Object for NodeTile<'_> {
                 color: self.outline,
             }
         );
-
         // draw connection points
         self.draw_connections();
 
@@ -159,16 +159,21 @@ impl NodeTile<'_> {
             DialogueTree::Story { .. } => STORY_NODE_OUTLINE,
         };
 
+        let connections = (
+            Connection::new(x, y + height / 2.0),
+            Connection::new(x + width, y + height / 2.0)
+        );
+
         NodeTile {
             x,
             y,
             width,
             height,
             thickness: 2.0,
-            radius: 5.0,
             line_spacing: 0.7,
             last_click: None,
             node,
+            connections,
             fill: PANEL_BG_FILL,
             outline,
             drag: Drag::default(),
@@ -333,41 +338,17 @@ impl NodeTile<'_> {
     }
 
     fn draw_connections(&self) {
-        // todo : detect if a connection is hovered, if so color it different,
-        //  and add click detection for connecting nodes
-        //  maybe make the points their own object
         match self.node {
             DialogueTree::Player { .. } => {
-                let (x1, x2) = (self.x, self.x + self.width);
-                let (y1, y2) = (self.y + self.height / 2.0, self.y + self.height / 2.0);
-
-                // draw in point
-                draw_circle(x1, y1, self.radius, WHITE);
-                draw_circle_lines(x1, y1, self.radius, self.thickness, BLACK);
-
-                // draw out point
-                draw_circle(x2, y2, self.radius, WHITE);
-                draw_circle_lines(x2, y2, self.radius, self.thickness, BLACK);
-
+                self.connections.0.draw();
+                self.connections.1.draw();
             },
             DialogueTree::NPC { .. } => {
-                let (x1, x2) = (self.x, self.x + self.width);
-                let (y1, y2) = (self.y + self.height / 2.0, self.y + self.height / 2.0);
-
-                // draw in point
-                draw_circle(x1, y1, self.radius, WHITE);
-                draw_circle_lines(x1, y1, self.radius, self.thickness, BLACK);
-
-                // draw out point
-                draw_circle(x2, y2, self.radius, WHITE);
-                draw_circle_lines(x2, y2, self.radius, self.thickness, BLACK);
+                self.connections.0.draw();
+                self.connections.1.draw();
             },
             DialogueTree::Story { .. } => {
-                let (x, y) = (self.x, self.y + self.height / 2.0);
-
-                // draw in point
-                draw_circle(x, y, self.radius, WHITE);
-                draw_circle_lines(x, y, self.radius, self.thickness, BLACK);
+                self.connections.0.draw();
             },
         }
     }

@@ -29,7 +29,7 @@ pub async fn run() {
 
         // toolbar action handling
         let toolbar_action = toolbar.handle_input();
-        let text = String::from("Enter text here...");
+        let text = String::from("text here...");
         match toolbar_action {
             Some(ToolbarAction::AddPlayer) => {
                 let node = DialogueTree::Player {
