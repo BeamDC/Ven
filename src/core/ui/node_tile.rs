@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use std::time::Instant;
 use macroquad::color::{Color, WHITE};
 use macroquad::prelude::{draw_rectangle_ex, measure_text, Font, TextParams, BLACK};
-use macroquad::shapes::{draw_rectangle_lines_ex, DrawRectangleParams};
-use macroquad::text::draw_text_ex;
+use macroquad::shapes::{draw_circle, draw_circle_lines, draw_rectangle_lines_ex, DrawRectangleParams};
+use macroquad::text::{draw_multiline_text, draw_multiline_text_ex, draw_text_ex, TextDimensions};
 use crate::constants::{NODE_MANAGER_LINES, NPC_NODE_OUTLINE, PANEL_BG_FILL, PANEL_OUTLINE_FILL, PLAYER_NODE_OUTLINE, STORY_NODE_OUTLINE};
 use crate::core::components::dialogue_tree::DialogueTree;
 use crate::core::traits::draggable::{Drag, Draggable};
@@ -18,6 +18,8 @@ pub struct NodeTile<'a> {
     pub width: f32,
     pub height: f32,
     pub thickness: f32,
+    pub radius: f32,
+    pub line_spacing: f32,
     pub last_click: Option<Instant>,
 
     pub node: DialogueTree,
@@ -163,6 +165,8 @@ impl NodeTile<'_> {
             width,
             height,
             thickness: 2.0,
+            radius: 5.0,
+            line_spacing: 0.7,
             last_click: None,
             node,
             fill: PANEL_BG_FILL,
@@ -224,34 +228,88 @@ impl NodeTile<'_> {
     }
 
     fn draw_content(&self) {
-        let content = &*match self.node.clone() {
+        let mut content = &*match self.node.clone() {
             DialogueTree::Player { text, .. } => text,
             DialogueTree::NPC { text, .. } => text,
             DialogueTree::Story { text, .. } => text
         };
+        let mut content_string = content.to_string();
+        let mut font_size = self.get_font_size();
 
         // shrink detail to fit
         let mut dim = measure_text(
             content,
             self.font,
-            self.font_size,
+            font_size,
             1.0,
         );
 
-        // todo : insert newlines when text gets too long for the width
-        //  after adding newlines, if text still doesnt fit shrink it and reapply newlines.
-        //  if text is still to big after a threshold size,
-        //  clamp it to that size and instead add "..." at some point to cut it off
-        let mut font_size = self.get_font_size();
-        while dim.width >= self.width || dim.height >= self.height / 4.0 {
+        // fit the text into the tile
+        loop {
+            // remove any existing newlines from content_string
+            content_string = content_string.replace("\n", "");
+
+            // line wrapping
+            if dim.width >= self.width {
+                let mut start = 0;
+                let mut pos = 0;
+
+                while pos < content_string.len() {
+                    let mut end = pos;
+
+                    while end < content_string.len() {
+                        let slice = str::from_utf8(
+                            &content_string.as_bytes()[start..end + 1]
+                        ).unwrap();
+                        let slice_dim = measure_text(
+                            slice,
+                            self.font,
+                            font_size,
+                            1.0,
+                        );
+
+                        if slice_dim.width > self.width { break }
+                        end += 1;
+                    }
+
+                    if end == pos {
+                        end = pos + 1;
+                    }
+
+                    if end < content_string.len() {
+                        content_string.insert(end, '\n');
+                    }
+
+                    pos = end + 1;
+                    start = pos;
+                }
+            }
+
+            // get total height of text block,
+            // if it's too tall shrink font size by one
+            let lines = content_string.split('\n').collect::<Vec<&str>>();
+            let height = lines.iter().enumerate().map(|(i, line)| {
+                 measure_text(
+                    line,
+                    self.font,
+                    font_size,
+                    1.0,
+                ).height
+            }).sum::<f32>() * 1.3;
+
+            // if font size is too small, or text fits, break
+            if height < self.height - self.height / 4.0 || font_size <= 8 {
+                break
+            }
             font_size -= 1;
-            dim = measure_text(
-                content,
-                self.font,
-                font_size,
-                1.0,
-            );
         }
+
+        // if a newline is followed by whitespace, remove the space
+        content_string = content_string.split('\n').map(|line| {
+            line.trim_start()
+        }).collect::<Vec<&str>>().join("\n");
+        // todo : if the text is still too big, cut it with the "..."
+        content = content_string.as_str();
 
         let pad_x = self.x + self.get_thickness();
         let pad_y = self.y + self.height / 4.0 + dim.height + self.get_thickness();
@@ -265,17 +323,52 @@ impl NodeTile<'_> {
             color: self.text_color,
         };
 
-        draw_text_ex(
+        draw_multiline_text_ex(
             content,
             pad_x,
             pad_y,
+            Some(self.line_spacing),
             params
         );
     }
 
     fn draw_connections(&self) {
-        todo!("
-        draw connection points for nodes at the midpoint of each vertical edge,
-        draw lines between the connection points of nodes which are connected");
+        // todo : detect if a connection is hovered, if so color it different,
+        //  and add click detection for connecting nodes
+        //  maybe make the points their own object
+        match self.node {
+            DialogueTree::Player { .. } => {
+                let (x1, x2) = (self.x, self.x + self.width);
+                let (y1, y2) = (self.y + self.height / 2.0, self.y + self.height / 2.0);
+
+                // draw in point
+                draw_circle(x1, y1, self.radius, WHITE);
+                draw_circle_lines(x1, y1, self.radius, self.thickness, BLACK);
+
+                // draw out point
+                draw_circle(x2, y2, self.radius, WHITE);
+                draw_circle_lines(x2, y2, self.radius, self.thickness, BLACK);
+
+            },
+            DialogueTree::NPC { .. } => {
+                let (x1, x2) = (self.x, self.x + self.width);
+                let (y1, y2) = (self.y + self.height / 2.0, self.y + self.height / 2.0);
+
+                // draw in point
+                draw_circle(x1, y1, self.radius, WHITE);
+                draw_circle_lines(x1, y1, self.radius, self.thickness, BLACK);
+
+                // draw out point
+                draw_circle(x2, y2, self.radius, WHITE);
+                draw_circle_lines(x2, y2, self.radius, self.thickness, BLACK);
+            },
+            DialogueTree::Story { .. } => {
+                let (x, y) = (self.x, self.y + self.height / 2.0);
+
+                // draw in point
+                draw_circle(x, y, self.radius, WHITE);
+                draw_circle_lines(x, y, self.radius, self.thickness, BLACK);
+            },
+        }
     }
 }
