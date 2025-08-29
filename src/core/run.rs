@@ -7,6 +7,7 @@ use crate::core::components::dialogue_tree::DialogueTree;
 use crate::core::traits::draggable::Draggable;
 use crate::core::ui::node_manager::{NodeAction, NodeManager};
 use crate::core::ui::node_tile::NodeTile;
+use crate::core::ui::text_editor::NodeTextEdit;
 
 pub async fn run() {
     let mut toolbar = Toolbar::new(screen_width(), TOOLBAR_HEIGHT);
@@ -37,6 +38,7 @@ pub async fn run() {
                     text,
                     next: vec![],
                 };
+                node_manager.editors.push(NodeTextEdit::new(node.clone()));
                 let tile = NodeTile::new(
                     node_manager.x, node_manager.y,
                     NODE_TILE_WIDTH, NODE_TILE_HEIGHT,
@@ -51,6 +53,7 @@ pub async fn run() {
                     text,
                     next: vec![],
                 };
+                node_manager.editors.push(NodeTextEdit::new(node.clone()));
                 let tile = NodeTile::new(
                     node_manager.x, node_manager.y,
                     NODE_TILE_WIDTH, NODE_TILE_HEIGHT,
@@ -63,6 +66,7 @@ pub async fn run() {
                     from: vec![],
                     text,
                 };
+                node_manager.editors.push(NodeTextEdit::new(node.clone()));
                 let tile = NodeTile::new(
                     node_manager.x, node_manager.y,
                     NODE_TILE_WIDTH, NODE_TILE_HEIGHT,

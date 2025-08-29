@@ -76,7 +76,7 @@ impl Object for SceneViewer<'_> {
         BLACK
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         draw_rectangle_ex(
             self.x, self.y,
             self.width, self.height,

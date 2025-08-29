@@ -97,7 +97,7 @@ impl Object for NodeTile<'_> {
         self.draw_content();
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         // draw base rect
         draw_rectangle_ex(
             self.x, self.y,
@@ -337,7 +337,7 @@ impl NodeTile<'_> {
         );
     }
 
-    fn draw_connections(&self) {
+    fn draw_connections(&mut self) {
         match self.node {
             DialogueTree::Player { .. } => {
                 self.connections.0.draw();

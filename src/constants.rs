@@ -37,3 +37,7 @@ pub const NODE_TILE_WIDTH: f32 = 200f32;
 pub const NODE_TILE_HEIGHT: f32 = 125f32;
 
 pub const DOUBLE_CLICK_DELAY_MS: u128 = 300u128;
+
+// egui related stuff
+// pub const DEFAULT_WINDOW_POS: (f32, f32) = (SCENE_VIEWER_WIDTH, TOOLBAR_HEIGHT);
+pub const DEFAULT_WINDOW_POS: (f32, f32) = (SCENE_VIEWER_WIDTH * 1.5, TOOLBAR_HEIGHT * 1.5);

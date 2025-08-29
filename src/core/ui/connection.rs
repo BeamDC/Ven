@@ -75,7 +75,7 @@ impl Object for Connection {
         todo!()
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         let color = match self.is_hovered() {
             true => RED,
             false => WHITE,

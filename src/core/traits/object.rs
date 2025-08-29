@@ -139,5 +139,5 @@ pub trait Object: Pos {
         );
     }
 
-    fn draw(&self);
+    fn draw(&mut self);
 }

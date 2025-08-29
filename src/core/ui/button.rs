@@ -78,7 +78,7 @@ impl Object for Button<'_> {
         self.font_size
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         let fill = self.fill;
         let stroke = self.stroke;
 

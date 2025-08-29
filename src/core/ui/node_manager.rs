@@ -10,6 +10,7 @@ use std::time::Instant;
 use macroquad::input::MouseButton;
 use crate::core::traits::draggable::Draggable;
 use crate::core::ui::node_manager::NodeAction::{RemoveIndex, SelectIndex};
+use crate::core::ui::text_editor::NodeTextEdit;
 
 pub enum NodeAction {
     RemoveIndex(usize),
@@ -29,6 +30,7 @@ pub struct NodeManager<'a> {
     pub lines: Color,
 
     pub nodes: Vec<NodeTile<'a>>,
+    pub editors: Vec<NodeTextEdit>,
     pub selected: Option<usize>,
 }
 
@@ -83,7 +85,7 @@ impl Object for NodeManager<'_> {
         BLACK
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         // draw base rectangle
         draw_rectangle_ex(
             self.x, self.y,
@@ -97,7 +99,7 @@ impl Object for NodeManager<'_> {
 
         // draw gridlines
         // draw node tiles
-        for  (i, mut node) in self.nodes.clone().iter_mut().enumerate() {
+        for  (i, mut node) in self.nodes.iter_mut().enumerate() {
             node.x = node.x.clamp(self.x, self.x + self.width - node.width);
             node.y = node.y.clamp(self.y, self.y + self.height - node.height);
 
@@ -113,6 +115,19 @@ impl Object for NodeManager<'_> {
             });
             if self.selected.is_some() && i == self.selected.unwrap() {
                 node.outline = NODE_SELECT_OUTLINE;
+                let (title, content) = self.editors[i].display();
+                let new = match node.node.clone() {
+                    DialogueTree::Player { from, next, .. } => {
+                        DialogueTree::Player { from, text: content, next }
+                    }
+                    DialogueTree::NPC { from, next, .. } => {
+                        DialogueTree::NPC { from, speaker: title.unwrap(), text: content, next }
+                    }
+                    DialogueTree::Story { from, .. } => {
+                        DialogueTree::Story { from, text: content }
+                    }
+                };
+                node.node = new;
             }
 
             node.connections.0.x = node.x;
@@ -141,6 +156,7 @@ impl NodeManager<'_> {
             outline: PANEL_OUTLINE_FILL,
             lines: NODE_MANAGER_LINES,
             nodes: vec![],
+            editors: vec![],
             selected: None
         }
     }
@@ -156,12 +172,14 @@ impl NodeManager<'_> {
                 let time = Instant::now();
                 if let Some(last) = node.last_click {
                     if last.elapsed().as_millis() <= DOUBLE_CLICK_DELAY_MS {
-                         return Some(SelectIndex(i))
+                        return Some(SelectIndex(i))
                     }
                 }
                 node.last_click = Some(time);
             }
         }
+
+
 
         // node deletion
         for (i, node) in self.nodes.iter().enumerate().rev() {
