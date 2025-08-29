@@ -1,2 +1,2 @@
 # Ven
-a game engine
+a dialogue tree builder
